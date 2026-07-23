@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ☁️ Cloud Cost Optimization with Automation
 
 > **Automated cloud cost monitoring, idle resource detection, and budget alerting on AWS — fully provisioned with Terraform and deployed via GitLab CI/CD.**
@@ -302,3 +303,7 @@ Or trigger the **tf:destroy** manual step in the GitLab pipeline.
 - [AWS Budgets](https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html)
 - [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
 - [GitLab CI/CD Docs](https://docs.gitlab.com/ee/ci/)
+=======
+# Cloud-Cost-Optimization-Automation
+Automated cloud cost monitoring using AWS Lambda, Cost Explorer, CloudWatch, Terraform
+>>>>>>> 4b8cc5050ec656eeb7b79ed2beda388d85fe26a6
