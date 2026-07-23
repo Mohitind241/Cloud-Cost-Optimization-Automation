@@ -57,7 +57,7 @@ variable "monthly_budget_limit" {
 variable "cost_alert_email" {
   description = "Email address to receive cost-anomaly and budget alerts"
   type        = string
-  default     = "your-email@example.com"
+  default     = "mohitsinghhit25@gmail.com"
 }
 
 # ─── Lambda ───────────────────────────────────────────────────
