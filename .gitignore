@@ -1,0 +1,47 @@
+# Local Terraform working directories
+**/.terraform/*
+.terraform/
+.terraform.lock.hcl
+
+# Terraform plan files (may contain sensitive data)
+*.tfplan
+tfplan
+
+# Terraform state files — never commit state to VCS
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# Variable files with sensitive values
+*.tfvars
+*.tfvars.json
+
+# Override files
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Lambda build artifacts
+lambda/*.zip
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+
+# macOS artefacts
+.DS_Store
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo

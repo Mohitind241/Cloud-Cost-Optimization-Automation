@@ -1,0 +1,83 @@
+# ============================================================
+# GitLab CI/CD Pipeline
+# Project: Cloud Cost Optimization with Automation
+# Stages: validate → plan → apply → destroy (manual)
+# ============================================================
+
+image:
+  name: hashicorp/terraform:1.8
+  entrypoint:
+    - "/usr/bin/env"
+    - "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+# ─── Global Variables ─────────────────────────────────────────
+variables:
+  AWS_ACCESS_KEY_ID:       $AWS_ACCESS_KEY_ID       # Set in GitLab CI/CD → Settings → Variables
+  AWS_SECRET_ACCESS_KEY:   $AWS_SECRET_ACCESS_KEY   # Set in GitLab CI/CD → Settings → Variables
+  AWS_DEFAULT_REGION:      "us-east-1"
+  TF_IN_AUTOMATION:        "true"                   # Suppresses prompts
+
+# ─── Terraform Cache ──────────────────────────────────────────
+cache:
+  key: terraform-$CI_COMMIT_REF_SLUG
+  paths:
+    - .terraform/
+    - .terraform.lock.hcl
+
+# ─── Shared init step ─────────────────────────────────────────
+before_script:
+  - terraform --version
+  - terraform init -backend-config="tfstate.config" -input=false
+
+# ══════════════════════════════════════════════════════════════
+# STAGE DEFINITIONS
+# ══════════════════════════════════════════════════════════════
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+
+# ─── 1. Validate ──────────────────────────────────────────────
+tf:validate:
+  stage: validate
+  script:
+    - terraform fmt -check -recursive
+    - terraform validate
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+# ─── 2. Plan ──────────────────────────────────────────────────
+tf:plan:
+  stage: plan
+  script:
+    - terraform plan -out=tfplan -input=false
+  artifacts:
+    name:       "terraform-plan-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - tfplan
+    expire_in:  1 hour
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
+# ─── 3. Apply (protected branches only) ───────────────────────
+tf:apply:
+  stage: apply
+  script:
+    - terraform apply -input=false tfplan
+  dependencies:
+    - tf:plan
+  environment:
+    name: $CI_COMMIT_REF_NAME
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual      # Requires explicit approval in GitLab UI
+
+# ─── 4. Destroy (manual gate) ─────────────────────────────────
+tf:destroy:
+  stage: destroy
+  script:
+    - terraform destroy -auto-approve -input=false
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual      # ⚠ Will DELETE all infrastructure — use with caution
